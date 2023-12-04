@@ -16,7 +16,6 @@ def day_03_01(lines: list[str]) -> int:
             neighbourhood = ''.join(neighbours)
             if re.findall(r'[^\d\.]+', neighbourhood):
                 nums.append(int(match.group()))
-    print(nums)
     return sum(nums)
 
 
