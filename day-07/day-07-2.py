@@ -43,14 +43,13 @@ def assign_power(cards):
     raise AssertionError
 
 
-def day_07_01(lines: list[str]) -> int:
+def day_07_02(lines: list[str]) -> int:
     hands = [x.split(' ') for x in lines]
     for i in range(len(hands)):
         hands[i][0] = cards_to_nums(hands[i][0])
         hands[i][1] = int(hands[i][1])
         hands[i].append(assign_power(hands[i][0]))
     hands_sorted = sorted(hands, key=cmp_to_key(ranking_function))
-    print(hands_sorted)
     return sum([x[1] * (i + 1) for i, x in enumerate(hands_sorted)])
 
 
@@ -58,5 +57,5 @@ if __name__ == '__main__':
     input_lines = []
     while a := input():
         input_lines.append(a)
-    result = day_07_01(input_lines)
+    result = day_07_02(input_lines)
     print(result)

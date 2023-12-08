@@ -45,7 +45,6 @@ def day_07_01(lines: list[str]) -> int:
         hands[i][1] = int(hands[i][1])
         hands[i].append(assign_power(hands[i][0]))
     hands_sorted = sorted(hands, key=cmp_to_key(ranking_function))
-    print(hands_sorted)
     return sum([x[1] * (i + 1) for i, x in enumerate(hands_sorted)])
 
 
