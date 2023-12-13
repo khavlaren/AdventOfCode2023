@@ -28,7 +28,6 @@ def day_12_02(lines: list[str]) -> int:
         groups = tuple(map(int, groups.split(','))) * 5
         line_variations = f(line, groups, 0, 0, 0)
         variations.append(line_variations)
-    print(variations)
     return sum(variations)
 
 
