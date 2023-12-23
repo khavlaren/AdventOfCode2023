@@ -1,7 +1,6 @@
 import sys
 from queue import Queue
-from collections import defaultdict
-
+from collections import defaultdict, deque
 
 sys.setrecursionlimit(10000)
 
@@ -22,17 +21,20 @@ def construct_graph(lines: list[str]) -> defaultdict[tuple]:
     seen = set()
     while not q.empty():
         (i, j), (i_dir, j_dir) = q.get()
+        pos_i, pos_j = i, j
         length = 0
         while True:
-            new_i, new_j = i + i_dir * (length + 1), j + j_dir * (length + 1)
+            new_i, new_j = pos_i + i_dir, pos_j + j_dir
             available_directions = []
             for _i_dir, _j_dir in directions.values():
                 pi, pj = new_i + _i_dir, new_j + _j_dir
                 if 0 <= pi < len(lines) and 0 <= pj < len(lines[0]) and lines[pi][pj] != '#' \
                         and (i_dir, j_dir) != (-_i_dir, -_j_dir):
                     available_directions.append((_i_dir, _j_dir))
-            if available_directions == [(i_dir, j_dir)]:
+            if len(available_directions) == 1:
                 length += 1
+                i_dir, j_dir = available_directions[0]
+                pos_i, pos_j = new_i, new_j
             elif not available_directions:
                 graph[(i, j)].add(((new_i, new_j), length + 1))
                 graph[(new_i, new_j)].add(((i, j), length + 1))
@@ -50,29 +52,38 @@ def construct_graph(lines: list[str]) -> defaultdict[tuple]:
 
 
 def dfs(node: tuple, graph: defaultdict[tuple], seen: set[tuple], find_node: tuple) -> int:
-    i, j = node
-    if (i, j) in seen:
-        return -1
-    seen.add((i, j))
     if node == find_node:
         return 0
     max_len = -1
-    for dst_node, weight in graph[node]:
-        if dst_node not in seen:
-            potential_length = dfs(dst_node, graph, seen.copy(), find_node) + weight
-            max_len = max(max_len, potential_length)
-    return max_len if max_len != -1 else -1
+    for neighbor, weight in graph[node]:
+        if neighbor not in seen:
+            new_seen = seen | {neighbor}
+            potential_length = dfs(neighbor, graph, new_seen, find_node)
+            if potential_length != -1:
+                max_len = max(max_len, potential_length + weight)
+    return max_len
+
+
+def dfs_stolen(graph, start, end):
+    stack = deque([(start, 0, {start})])
+    max_distance = 0
+    while stack:
+        node, current_distance, visited = stack.pop()
+        if node == end:
+            max_distance = max(max_distance, current_distance)
+            continue
+        for neighbor, weight in graph[node]:
+            if neighbor not in visited:
+                new_distance = current_distance + weight
+                new_visited = visited | {neighbor}
+                stack.append((neighbor, new_distance, new_visited))
+    return max_distance
 
 
 def day_23_01(lines: list[str]) -> int:
     graph = construct_graph(lines)
     print(graph)
-    for i in range(len(lines)):
-        for k, v in graph.items():
-            if k[0] == i:
-                print(k, '->', v)
-        print()
-    return dfs((0, 1), graph, set(), (len(lines) - 1, len(lines[0]) - 2)) - 1
+    return dfs((0, 1), graph, {(0, 1)}, (len(lines) - 1, len(lines[0]) - 2))
 
 
 if __name__ == '__main__':

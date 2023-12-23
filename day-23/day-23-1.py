@@ -19,7 +19,7 @@ def dfs(node: tuple, graph: list[str], seen: set[tuple]) -> int:
         return -1
     seen.add((i, j))
     if node == (len(graph) - 1, len(graph[0]) - 2):
-        return 1
+        return 0
     if graph[i][j] in directions:
         i_dir, j_dir = directions[graph[i][j]]
         new_i = i + i_dir
@@ -41,7 +41,7 @@ def dfs(node: tuple, graph: list[str], seen: set[tuple]) -> int:
 
 
 def day_23_01(lines: list[str]) -> int:
-    return dfs((0, 1), lines, set()) - 1
+    return dfs((0, 1), lines, set())
 
 
 if __name__ == '__main__':
